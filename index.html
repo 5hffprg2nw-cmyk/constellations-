@@ -504,7 +504,6 @@
           for (let j = i + 1; j < nodes.length; j++) {
             const dx = nodes[j].x - nodes[i].x;
             const dy = nodes[j].y - nodes[i].y;
-            // Treat horizontal distance as tighter so wide text labels don't collide
             const scaledDx = dx * 0.65;
             const scaledDy = dy * 1.15;
             const dist = Math.hypot(scaledDx, scaledDy) || 1;
@@ -519,6 +518,7 @@
             }
           }
         }
+
         for (const n of nodes) {
           const target = clusterCenters[n.cluster];
           n.x += (target.x - n.x) * 0.012;
@@ -536,6 +536,7 @@
             const shift = (290 - gapX) * 0.04;
             nonPhil.x = Math.max(145, nonPhil.x - shift);
             ant.x = Math.min(width - 145, ant.x + shift);
+          }
         }
       }
     }
