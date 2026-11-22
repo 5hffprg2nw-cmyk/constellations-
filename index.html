@@ -545,14 +545,14 @@
           const dx2 = pot.x - fnm.x;
           const dy2 = pot.y - fnm.y;
           const dist2 = Math.hypot(dx2, dy2) || 1;
-          if (dist2 < 175) {
-            const push2 = (175 - dist2) * 0.05;
+          if (dist2 < 185) {
+            const push2 = (185 - dist2) * 0.05;
             const ux2 = dx2 / dist2;
             const uy2 = dy2 / dist2;
             fnm.x = Math.max(145, Math.min(width - 145, fnm.x - ux2 * push2));
-            fnm.y = Math.max(55, Math.min(height - 55, fnm.y - uy2 * push2));
+            fnm.y = Math.max(55, Math.min(height - 55, fnm.y - uy2 * push2 + 0.6));
             pot.x = Math.max(145, Math.min(width - 145, pot.x + ux2 * push2));
-            pot.y = Math.max(55, Math.min(height - 55, pot.y + uy2 * push2));
+            pot.y = Math.max(55, Math.min(height - 55, pot.y + uy2 * push2 - 1.4));
           }
         }
       }
