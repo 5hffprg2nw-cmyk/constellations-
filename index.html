@@ -517,8 +517,8 @@
         }
         for (const n of nodes) {
           const target = clusterCenters[n.cluster];
-          n.x += (target.x - n.x) * 0.02;
-          n.y += (target.y - n.y) * 0.02;
+          n.x += (target.x - n.x) * 0.01;
+          n.y += (target.y - n.y) * 0.01;
           n.x = Math.max(75, Math.min(width - 75, n.x));
           n.y = Math.max(55, Math.min(height - 55, n.y));
         }
