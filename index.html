@@ -526,6 +526,17 @@
           n.x = Math.max(145, Math.min(width - 145, n.x));
           n.y = Math.max(55, Math.min(height - 55, n.y));
         }
+
+        const ant = nodeById["actor-network-theory"];
+        const nonPhil = nodeById["non-philosophy"];
+        if (ant && nonPhil) {
+          const gapX = ant.x - nonPhil.x;
+          const gapY = Math.abs(ant.y - nonPhil.y);
+          if (gapY < 55 && gapX < 290) {
+            const shift = (290 - gapX) * 0.04;
+            nonPhil.x = Math.max(145, nonPhil.x - shift);
+            ant.x = Math.min(width - 145, ant.x + shift);
+        }
       }
     }
 
