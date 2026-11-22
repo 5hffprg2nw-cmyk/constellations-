@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post-Structural & Post-Critical Constellations</title>
+  <style>
+    :root {
+      --bg: #0c0f14;
+      --panel: #141922;
+      --panel-2: #1b2230;
+      --text: #e8ecf3;
+      --muted: #9aa5b8;
+      --accent: #7aa2f7;
+      --border: #283142;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--panel);
+    }
+    h1 { font-size: 1.1rem; margin: 0; }
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; }
+    select, input {
+      background: var(--panel-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 0.9rem;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      min-height: calc(100vh - 64px);
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; }
+    }
+    #stage { position: relative; overflow: hidden; min-height: 520px; }
+    svg { width: 100%; height: 100%; display: block; }
+    .tooltip {
+      position: fixed;
+      pointer-events: none;
+      max-width: 320px;
+      background: rgba(20, 25, 34, 0.96);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+      opacity: 0;
+      transition: opacity 0.12s ease;
+      z-index: 20;
+    }
+    aside {
+      border-left: 1px solid var(--border);
+      background: var(--panel);
+      padding: 18px;
+      overflow-y: auto;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 16px; }
+    .chip {
+      font-size: 0.78rem;
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 4px 8px;
+    }
+    ul.links { list-style: none; padding: 0; margin: 8px 0 0; }
+    ul.links li { margin-bottom: 6px; }
+    ul.links a { color: var(--accent); text-decoration: none; }
+    ul.links a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Post-Structural & Post-Critical Constellations</h1>
+    <div class="controls">
+      <select id="clusterFilter">
+        <option value="all">All Clusters</option>
+        <option value="Ontological & Realist Breaks">Ontological & Realist Breaks</option>
+        <option value="Materiality, Embodiment & Technics">Materiality, Embodiment & Technics</option>
+        <option value="Subjectivity, Negativity & Politics">Subjectivity, Negativity & Politics</option>
+        <option value="Situated, Decolonial & Diasporic Critiques">Situated, Decolonial & Diasporic Critiques</option>
+      </select>
+      <input id="searchInput" type="search" placeholder="Filter thinker or touchstone..." />
+    </div>
+  </header>
+  <div class="layout">
+    <div id="stage">
+      <svg id="map"></svg>
+      <div id="tooltip" class="tooltip"></div>
+    </div>
+    <aside id="inspector">
+      <p style="color: var(--muted);">Hover a node for a snippet, or click a constellation to inspect touchstones, post-structuralist engagement, and reference links.</p>
+    </aside>
+  </div>
+  <script>
+    const CONSTELLATIONS = [
+      {
+        id: "speculative-realism",
+        title: "Speculative Realism",
+        cluster: "Ontological & Realist Breaks",
+        snippet: "Challenges post-Kantian correlationism via hyper-chaos (Meillassoux) or withdrawn objects (Harman).",
+        touchstones: ["Correlationism", "Hyper-chaos", "Object-oriented ontology", "Withdrawal", "Ancestrality"],
+        engagement: "Attacks the post-Kantian correlationist consensus that thought cannot access mind-independent reality outside language or consciousness.",
+        figures: [
+          { name: "Quentin Meillassoux", url: "https://en.wikipedia.org/wiki/Quentin_Meillassoux" },
+          { name: "Graham Harman", url: "https://en.wikipedia.org/wiki/Graham_Harman" },
+          { name: "Ray Brassier", url: "https://en.wikipedia.org/wiki/Ray_Brassier" },
+          { name: "Iain Hamilton Grant", url: "https://en.wikipedia.org/wiki/Iain_Hamilton_Grant" }
+        ]
+      },
+      {
+        id: "neo-rationalism",
+        title: "Neo-Rationalism & Inhumanism",
+        cluster: "Ontological & Realist Breaks",
+        snippet: "Decouples Reason from coercive humanism into open-ended inferential navigation and self-revision.",
+        touchstones: ["Inferentialism", "Normativity", "Inhumanism", "Epistemic navigation", "Self-revision"],
+        engagement: "Rejects equating Reason with power or logocentrism, arguing that abandoning rationalist norms leaves theory vulnerable before myth and capital.",
+        figures: [
+          { name: "Reza Negarestani", url: "https://en.wikipedia.org/wiki/Reza_Negarestani" },
+          { name: "Ray Brassier", url: "https://en.wikipedia.org/wiki/Ray_Brassier" },
+          { name: "Pete Wolfendale", url: "https://en.wikipedia.org/wiki/Pete_Wolfendale" },
+          { name: "Robert Brandom", url: "https://en.wikipedia.org/wiki/Robert_Brandom" }
+        ]
+      },
+      {
+        id: "feminist-new-materialism",
+        title: "Feminist New Materialism & Agential Realism",
+        cluster: "Materiality, Embodiment & Technics",
+        snippet: "Treats matter as active intra-action rather than a passive surface inscribed by discourse.",
+        touchstones: ["Intra-action", "Agential cuts", "Material-discursive entanglement", "Vitality of matter", "Trans-corporeality"],
+        engagement: "Responds to 1990s social constructivism and performativity theory by insisting matter itself is generative without returning to static biological essentialism.",
+        figures: [
+          { name: "Karen Barad", url: "https://en.wikipedia.org/wiki/Karen_Barad" },
+          { name: "Elizabeth Grosz", url: "https://en.wikipedia.org/wiki/Elizabeth_Grosz" },
+          { name: "Rosi Braidotti", url: "https://en.wikipedia.org/wiki/Rosi_Braidotti" },
+          { name: "Stacy Alaimo", url: "https://en.wikipedia.org/wiki/Stacy_Alaimo" },
+          { name: "Jane Bennett", url: "https://en.wikipedia.org/wiki/Jane_Bennett_(political_theorist)" }
+        ]
+      },
+      {
+        id: "plasticity-neuro-philosophy",
+        title: "Plasticity & Continental Neuro-Philosophy",
+        cluster: "Materiality, Embodiment & Technics",
+        snippet: "Replaces textuality as primary motor of difference with neurobiological and existential plasticity.",
+        touchstones: ["Plasticity", "Destructive plasticity", "Epigenesis", "Transcendental materialism", "Brain-world continuity"],
+        engagement: "Challenges Derridean ecriture by foregrounding brain plasticity and trauma as sites of irreversible metamorphosis without teleology.",
+        figures: [
+          { name: "Catherine Malabou", url: "https://en.wikipedia.org/wiki/Catherine_Malabou" },
+          { name: "Adrian Johnston", url: "https://en.wikipedia.org/wiki/Adrian_Johnston_(philosopher)" }
+        ]
+      },
+      {
+        id: "lacanian-non-all",
+        title: "Contemporary Lacanian Psychoanalysis & the Non-All",
+        cluster: "Subjectivity, Negativity & Politics",
+        snippet: "Reads Lacan's pas-tout (non-all) ontologically: Being itself has an irreducible internal deadlock.",
+        touchstones: ["Pas-tout (non-all)", "Objet a", "Sexuation", "Less than nothing", "Constitutive antagonism"],
+        engagement: "Pushes back against reducing desire to power effects, locating an ontological incompleteness that blocks total closure.",
+        figures: [
+          { name: "Slavoj Zizek", url: "https://en.wikipedia.org/wiki/Slavoj_%C5%BDi%C5%BEek" },
+          { name: "Alenka Zupancic", url: "https://en.wikipedia.org/wiki/Alenka_Zupan%C4%8Di%C4%8D" },
+          { name: "Joan Copjec", url: "https://en.wikipedia.org/wiki/Joan_Copjec" },
+          { name: "Mladen Dolar", url: "https://en.wikipedia.org/wiki/Mladen_Dolar" }
+        ]
+      },
+      {
+        id: "non-philosophy",
+        title: "Non-Philosophy / Non-Standard Philosophy",
+        cluster: "Ontological & Realist Breaks",
+        snippet: "Thinks from a foreclosed One-in-One rather than splitting Being in two like standard Philosophy.",
+        touchstones: ["The Philosophical Decision", "The One-in-One", "Foreclosure", "Vision-in-One", "Radical immanence"],
+        engagement: "Diagnoses deconstruction as still bound to Philosophy's binary decision, treating philosophical systems as raw material.",
+        figures: [
+          { name: "Francois Laruelle", url: "https://en.wikipedia.org/wiki/Fran%C3%A7ois_Laruelle" },
+          { name: "Anne-Francoise Schmid", url: "https://en.wikipedia.org/wiki/Anne-Fran%C3%A7oise_Schmid" },
+          { name: "John O Maoilearca", url: "https://en.wikipedia.org/wiki/John_%C3%93_Maoilearca" }
+        ]
+      },
+      {
+        id: "philosophy-of-technics",
+        title: "Philosophy of Technics & Cosmotechnics",
+        cluster: "Materiality, Embodiment & Technics",
+        snippet: "Extends differance into technics and replaces linear teleology with cosmotechnics and recursivity.",
+        touchstones: ["Epiphylogenesis", "Tertiary retention", "Pharmakon", "Cosmotechnics", "Recursivity", "Negentropy"],
+        engagement: "Argues post-structuralism under-theorized how technical memory industrializes consciousness, countering entropy with situated cosmotechnics.",
+        figures: [
+          { name: "Bernard Stiegler", url: "https://en.wikipedia.org/wiki/Bernard_Stiegler" },
+          { name: "Yuk Hui", url: "https://en.wikipedia.org/wiki/Yuk_Hui" },
+          { name: "Gilbert Simondon", url: "https://en.wikipedia.org/wiki/Gilbert_Simondon" }
+        ]
+      },
+      {
+        id: "actor-network-theory",
+        title: "Actor-Network Theory & Post-Critical Assemblage",
+        cluster: "Materiality, Embodiment & Technics",
+        snippet: "Maps provisional human and non-human assemblages instead of unmasking hidden structures.",
+        touchstones: ["Actants", "Symmetrical anthropology", "Matters of concern", "Cosmopolitics", "Flat assemblage", "Post-critical reading"],
+        engagement: "Argues critique-as-unmasking ran out of steam, replacing suspicion with empirical tracing of actants and matters of concern.",
+        figures: [
+          { name: "Bruno Latour", url: "https://en.wikipedia.org/wiki/Bruno_Latour" },
+          { name: "Isabelle Stengers", url: "https://en.wikipedia.org/wiki/Isabelle_Stengers" },
+          { name: "Michel Callon", url: "https://en.wikipedia.org/wiki/Michel_Callon" },
+          { name: "Manuel DeLanda", url: "https://en.wikipedia.org/wiki/Manuel_DeLanda" },
+          { name: "Rita Felski", url: "https://en.wikipedia.org/wiki/Rita_Felski" }
+        ]
+      },
+      {
+        id: "post-foundational-political",
+        title: "Post-Foundational Political Ontology",
+        cluster: "Subjectivity, Negativity & Politics",
+        snippet: "Treats the absence of an ultimate ground (Abgrund) as the condition of contingent politics.",
+        touchstones: ["Abgrund", "Politics vs. the political", "Hegemony", "Dissensus vs. police", "Equaliberty"],
+        engagement: "Formalizes groundlessness politically through antagonism, hegemony, and dissensus without surrendering to apolitical metaphysics.",
+        figures: [
+          { name: "Ernesto Laclau", url: "https://en.wikipedia.org/wiki/Ernesto_Laclau" },
+          { name: "Chantal Mouffe", url: "https://en.wikipedia.org/wiki/Chantal_Mouffe" },
+          { name: "Jacques Ranciere", url: "https://en.wikipedia.org/wiki/Jacques_Ranci%C3%A8re" },
+          { name: "Etienne Balibar", url: "https://en.wikipedia.org/wiki/%C3%89tienne_Balibar" },
+          { name: "Oliver Marchart", url: "https://en.wikipedia.org/wiki/Oliver_Marchart" }
+        ]
+      },
+      {
+        id: "enactivism-4e",
+        title: "Enactivism, 4E Cognition & Neurophenomenology",
+        cluster: "Materiality, Embodiment & Technics",
+        snippet: "Grounds sense-making in living, embodied structural coupling rather than text or pure brain.",
+        touchstones: ["Autopoiesis", "4E mind", "Sense-making", "Structural coupling", "Neurophenomenology"],
+        engagement: "Synthesizes phenomenology and dynamical systems to bypass both linguistic idealism and eliminative materialism.",
+        figures: [
+          { name: "Francisco Varela", url: "https://en.wikipedia.org/wiki/Francisco_Varela" },
+          { name: "Evan Thompson", url: "https://en.wikipedia.org/wiki/Evan_Thompson" },
+          { name: "Ezequiel Di Paolo", url: "https://en.wikipedia.org/wiki/Ezequiel_Di_Paolo" }
+        ]
+      },
+      {
+        id: "ontological-turn",
+        title: "The Ontological Turn in Anthropology",
+        cluster: "Situated, Decolonial & Diasporic Critiques",
+        snippet: "Treats alter-ontologies as distinct worlds rather than mere cultural interpretations of one nature.",
+        touchstones: ["Multinaturalism", "Perspectivism", "Alter-ontology", "Equivocation"],
+        engagement: "Moves anthropology past cultural relativism toward taking radically different world-making practices seriously on their own terms.",
+        figures: [
+          { name: "Eduardo Viveiros de Castro", url: "https://en.wikipedia.org/wiki/Eduardo_Viveiros_de_Castro" },
+          { name: "Philippe Descola", url: "https://en.wikipedia.org/wiki/Philippe_Descola" },
+          { name: "Martin Holbraad", url: "https://en.wikipedia.org/wiki/Martin_Holbraad" }
+        ]
+      },
+      {
+        id: "indigenous-critical",
+        title: "Indigenous Critical Theory & Land-Based Relationality",
+        cluster: "Situated, Decolonial & Diasporic Critiques",
+        snippet: "Centers Indigenous law, kinship, and place-based relationality against settler-colonial extraction.",
+        touchstones: ["Grounded normativity", "More-than-human kinship", "Refusal", "Place-thought"],
+        engagement: "Challenges Western theory's abstraction of land, sovereignty, and non-human relations by grounding inquiry in Indigenous thought.",
+        figures: [
+          { name: "Glen Coulthard", url: "https://en.wikipedia.org/wiki/Glen_Coulthard" },
+          { name: "Leanne Betasamosake Simpson", url: "https://en.wikipedia.org/wiki/Leanne_Betasamosake_Simpson" },
+          { name: "Vanessa Watts", url: "https://en.wikipedia.org/wiki/Vanessa_Watts" },
+          { name: "Audra Simpson", url: "https://en.wikipedia.org/wiki/Audra_Simpson" }
+        ]
+      },
+      {
+        id: "decolonial-theory",
+        title: "Decolonial Theory & Pluriversal Transmodernity",
+        cluster: "Situated, Decolonial & Diasporic Critiques",
+        snippet: "Traces modern ontology to 1492 and coloniality, advocating pluriversality and border thinking.",
+        touchstones: ["Coloniality of Power/Being", "Pluriversality", "Border thinking", "Transmodernity", "Epistemic disobedience"],
+        engagement: "Critiques post-structuralism as an intra-European critique that leaves the colonial matrix of modernity unexamined.",
+        figures: [
+          { name: "Enrique Dussel", url: "https://en.wikipedia.org/wiki/Enrique_Dussel" },
+          { name: "Walter Mignolo", url: "https://en.wikipedia.org/wiki/Walter_Mignolo" },
+          { name: "Anibal Quijano", url: "https://en.wikipedia.org/wiki/An%C3%ADbal_Quijano" },
+          { name: "Nelson Maldonado-Torres", url: "https://en.wikipedia.org/wiki/Nelson_Maldonado-Torres" },
+          { name: "Maria Lugones", url: "https://en.wikipedia.org/wiki/Mar%C3%ADa_Lugones" }
+        ]
+      },
+      {
+        id: "afro-pessimism-para-ontology",
+        title: "Afro-Pessimism & Black Para-Ontology / Diasporic Critique",
+        cluster: "Situated, Decolonial & Diasporic Critiques",
+        snippet: "Confronts anti-Blackness in Western ontology alongside fugitive para-ontology and poetics of relation.",
+        touchstones: ["Social death", "The flesh vs. the body", "Para-ontology", "The undercommons", "Poetics of relation", "Genres of the human"],
+        engagement: "Exposes structural non-being in Western relationality while cultivating fugitive para-ontology and diasporic opacity.",
+        figures: [
+          { name: "Frank B. Wilderson III", url: "https://en.wikipedia.org/wiki/Frank_B._Wilderson_III" },
+          { name: "Jared Sexton", url: "https://en.wikipedia.org/wiki/Jared_Sexton" },
+          { name: "Hortense Spillers", url: "https://en.wikipedia.org/wiki/Hortense_Spillers" },
+          { name: "Fred Moten", url: "https://en.wikipedia.org/wiki/Fred_Moten" },
+          { name: "Sylvia Wynter", url: "https://en.wikipedia.org/wiki/Sylvia_Wynter" },
+          { name: "Edouard Glissant", url: "https://en.wikipedia.org/wiki/%C3%89douard_Glissant" }
+        ]
+      },
+      {
+        id: "queer-negativity-trans",
+        title: "Queer Negativity & Trans-Ontological Critique",
+        cluster: "Subjectivity, Negativity & Politics",
+        snippet: "Tests the limits of linguistic performativity through negativity, the death drive, and trans embodiment.",
+        touchstones: ["Antisocial thesis", "Reproductive futurism", "Sinthomosexuality", "Pharmacopornographic regime", "Trans fugitivity"],
+        engagement: "Moves beyond affirmative performativity to address psychic negativity, somatic mediation, and trans fugitivity.",
+        figures: [
+          { name: "Lee Edelman", url: "https://en.wikipedia.org/wiki/Lee_Edelman" },
+          { name: "Leo Bersani", url: "https://en.wikipedia.org/wiki/Leo_Bersani" },
+          { name: "Jack Halberstam", url: "https://en.wikipedia.org/wiki/Jack_Halberstam" },
+          { name: "Paul B. Preciado", url: "https://en.wikipedia.org/wiki/Paul_B._Preciado" },
+          { name: "Marquis Bey", url: "https://en.wikipedia.org/wiki/Marquis_Bey" },
+          { name: "Susan Stryker", url: "https://en.wikipedia.org/wiki/Susan_Stryker" }
+        ]
+      },
+      {
+        id: "new-realism-grounding",
+        title: "New Realism & Analytic Metaphysical Grounding",
+        cluster: "Ontological & Realist Breaks",
+        snippet: "Asserts 'the world does not exist' as a totality, only infinite fields of sense and grounded facts.",
+        touchstones: ["Fields of sense", "Non-existence of 'the world'", "Documentality", "Unedited real", "Metaphysical grounding"],
+        engagement: "Counters linguistic constructivism and totalizing metaphysics by grounding facts within non-totalizable fields of sense.",
+        figures: [
+          { name: "Markus Gabriel", url: "https://en.wikipedia.org/wiki/Markus_Gabriel" },
+          { name: "Maurizio Ferraris", url: "https://en.wikipedia.org/wiki/Maurizio_Ferraris" },
+          { name: "Kit Fine", url: "https://en.wikipedia.org/wiki/Kit_Fine" },
+          { name: "Jonathan Schaffer", url: "https://en.wikipedia.org/wiki/Jonathan_Schaffer" }
+        ]
+      },
+      {
+        id: "accelerationism-xenofeminism",
+        title: "Accelerationism & Xenofeminism",
+        cluster: "Subjectivity, Negativity & Politics",
+        snippet: "Pushes deterritorialization, technical abstraction, and anti-naturalism past folk-political limits.",
+        touchstones: ["Deterritorialization", "Hyperstition", "Capitalist realism", "Inhuman modernity", "Anti-naturalism"],
+        engagement: "Turns Deleuze-Guattarian deterritorialization against defensive localism, treating alienation and tech-abstraction as levers for change.",
+        figures: [
+          { name: "Nick Land", url: "https://en.wikipedia.org/wiki/Nick_Land" },
+          { name: "Mark Fisher", url: "https://en.wikipedia.org/wiki/Mark_Fisher" },
+          { name: "Nick Srnicek", url: "https://en.wikipedia.org/wiki/Nick_Srnicek" },
+          { name: "Alex Williams", url: "https://en.wikipedia.org/wiki/Alex_Williams_(theorist)" },
+          { name: "Laboria Cuboniks", url: "https://en.wikipedia.org/wiki/Xenofeminism" }
+        ]
+      },
+      {
+        id: "post-liberal-critical-political",
+        title: "Post-Liberal Critical Political Philosophy",
+        cluster: "Subjectivity, Negativity & Politics",
+        snippet: "Examines neoliberal rationality, democratic erosion, social reproduction, and political antagonism.",
+        touchstones: [
+          "Neoliberal rationality & economization",
+          "Crisis of liberal democracy",
+          "Redistribution, recognition & representation",
+          "Social reproduction",
+          "Authoritarian populism & subjectivity",
+          "Agonism & political antagonism",
+          "Postcapitalist & emancipatory imaginaries",
+          "Limits of liberal rights",
+          "Capitalism, democracy & ecological crisis"
+        ],
+        engagement: "Brings critiques of universalism, sovereignty, identity, and foundations into confrontation with capitalism, institutional power, democratic exhaustion, and social reproduction.",
+        figures: [
+          { name: "Nancy Fraser", url: "https://en.wikipedia.org/wiki/Nancy_Fraser" },
+          { name: "Wendy Brown", url: "https://en.wikipedia.org/wiki/Wendy_Brown" },
+          { name: "Rahel Jaeggi", url: "https://en.wikipedia.org/wiki/Rahel_Jaeggi" },
+          { name: "Albena Azmanova", url: "https://www.citystgeorges.ac.uk/about/people/academics/albena-azmanova" },
+          { name: "Jodi Dean", url: "https://en.wikipedia.org/wiki/Jodi_Dean" },
+          { name: "Chantal Mouffe", url: "https://en.wikipedia.org/wiki/Chantal_Mouffe" },
+          { name: "William Connolly", url: "https://en.wikipedia.org/wiki/William_E._Connolly" },
+          { name: "Étienne Balibar", url: "https://en.wikipedia.org/wiki/%C3%89tienne_Balibar" }
+        ]
+      }
+    ];
+
+    const LINKS = [
+      { source: "speculative-realism", target: "neo-rationalism", note: "Shared break with correlationism; diverges over contingency vs. normative reason" },
+      { source: "speculative-realism", target: "new-realism-grounding", note: "Parallel realist rejections of linguistic constructivism" },
+      { source: "speculative-realism", target: "non-philosophy", note: "Radical critiques of philosophical correlation and binary decision" },
+      { source: "feminist-new-materialism", target: "actor-network-theory", note: "Shared focus on non-human agency, flat assemblages, and material entanglement" },
+      { source: "feminist-new-materialism", target: "plasticity-neuro-philosophy", note: "Somatic and biological materiality beyond linguistic inscription" },
+      { source: "plasticity-neuro-philosophy", target: "enactivism-4e", note: "Embodied brain-world continuity without eliminative reductionism" },
+      { source: "plasticity-neuro-philosophy", target: "lacanian-non-all", note: "Debate over neurobiological plasticity vs. Lacanian death drive and negativity" },
+      { source: "lacanian-non-all", target: "post-foundational-political", note: "Constitutive antagonism and ontological lack as conditions of politics" },
+      { source: "lacanian-non-all", target: "queer-negativity-trans", note: "Deployment of the death drive and antisocial negativity against teleology" },
+      { source: "philosophy-of-technics", target: "accelerationism-xenofeminism", note: "Technics, abstraction, and deterritorialization as primary historical vectors" },
+      { source: "philosophy-of-technics", target: "plasticity-neuro-philosophy", note: "Epigenesis, tertiary retention, and technical/neuronal transformation" },
+      { source: "ontological-turn", target: "indigenous-critical", note: "Indigenous cosmologies and grounded relationality challenging Western nature/culture" },
+      { source: "indigenous-critical", target: "decolonial-theory", note: "Critique of settler-colonial temporality, recognition, and Eurocentric modernity" },
+      { source: "decolonial-theory", target: "afro-pessimism-para-ontology", note: "Exposing the colonial and anti-Black foundations of Western Being" },
+      { source: "afro-pessimism-para-ontology", target: "queer-negativity-trans", note: "Fugitivity, self-shattering, and refusal of normative subjecthood" },
+      { source: "non-philosophy", target: "afro-pessimism-para-ontology", note: "Laruelle's foreclosed immanence taken up in Black para-ontological thought" },
+      { source: "post-liberal-critical-political", target: "post-foundational-political", note: "Shared focus on antagonism, hegemony, equaliberty, and the limits of liberal consensus" },
+      { source: "post-liberal-critical-political", target: "lacanian-non-all", note: "Engages political subjectivity, ideological fantasies, and structural deadlocks under capitalism" },
+      { source: "post-liberal-critical-political", target: "feminist-new-materialism", note: "Intersects around embodiment, care/reproduction, and critiques of narrow individualism" }
+    ];
+
+    const COLORS = {
+      "Ontological & Realist Breaks": "#7aa2f7",
+      "Materiality, Embodiment & Technics": "#73daca",
+      "Subjectivity, Negativity & Politics": "#bb9af7",
+      "Situated, Decolonial & Diasporic Critiques": "#ff9e64"
+    };
+
+    const svg = document.getElementById("map");
+    const tooltip = document.getElementById("tooltip");
+    const inspector = document.getElementById("inspector");
+    const clusterFilter = document.getElementById("clusterFilter");
+    const searchInput = document.getElementById("searchInput");
+
+    let selectedId = null;
+    const width = 900;
+    const height = 650;
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+
+    const clusterCenters = {
+      "Ontological & Realist Breaks": { x: 260, y: 200 },
+      "Materiality, Embodiment & Technics": { x: 640, y: 200 },
+      "Subjectivity, Negativity & Politics": { x: 260, y: 460 },
+      "Situated, Decolonial & Diasporic Critiques": { x: 640, y: 460 }
+    };
+
+    const nodes = CONSTELLATIONS.map((c, i) => {
+      const base = clusterCenters[c.cluster];
+      const angle = (i * 1.35);
+      return {
+        ...c,
+        x: base.x + Math.cos(angle) * 95,
+        y: base.y + Math.sin(angle) * 85,
+        vx: 0,
+        vy: 0
+      };
+    });
+
+    const nodeById = Object.fromEntries(nodes.map(n => [n.id, n]));
+    const links = LINKS.map(l => ({
+      ...l,
+      sourceNode: nodeById[l.source],
+      targetNode: nodeById[l.target]
+    }));
+
+    function showTooltip(html, x, y) {
+      tooltip.innerHTML = html;
+      tooltip.style.left = Math.min(window.innerWidth - 340, x + 14) + "px";
+      tooltip.style.top = Math.min(window.innerHeight - 140, y + 14) + "px";
+      tooltip.style.opacity = "1";
+    }
+
+    function hideTooltip() {
+      tooltip.style.opacity = "0";
+    }
+
+    function renderInspector(node) {
+      selectedId = node.id;
+      const color = COLORS[node.cluster];
+      inspector.innerHTML = `
+        <span class="badge" style="color:${color}">${node.cluster}</span>
+        <h2 style="margin:4px 0 10px;font-size:1.15rem;">${node.title}</h2>
+        <p style="font-size:0.9rem;line-height:1.5;color:#cbd5e1;">${node.engagement}</p>
+        <h3 style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);margin-top:16px;">Thematic Touchstones</h3>
+        <div class="chips">${node.touchstones.map(t => `<span class="chip">${t}</span>`).join("")}</div>
+        <h3 style="font-size:0.8rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);">Key References & Links</h3>
+        <ul class="links">
+          ${node.figures.map(f => `<li><a href="${f.url}" target="_blank" rel="noopener noreferrer">${f.name} ↗</a></li>`).join("")}
+        </ul>
+      `;
+      draw();
+    }
+
+    function matchesFilter(node) {
+      const cVal = clusterFilter.value;
+      const q = searchInput.value.trim().toLowerCase();
+      if (cVal !== "all" && node.cluster !== cVal) return false;
+      if (!q) return true;
+      return (
+        node.title.toLowerCase().includes(q) ||
+        node.snippet.toLowerCase().includes(q) ||
+        node.touchstones.some(t => t.toLowerCase().includes(q)) ||
+        node.figures.some(f => f.name.toLowerCase().includes(q))
+      );
+    }
+
+    function stepSimulation() {
+      for (let iter = 0; iter < 120; iter++) {
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const dx = nodes[j].x - nodes[i].x;
+            const dy = nodes[j].y - nodes[i].y;
+            const dist = Math.hypot(dx, dy) || 1;
+            if (dist < 110) {
+              const push = (110 - dist) * 0.03;
+              const ux = dx / dist, uy = dy / dist;
+              nodes[i].x -= ux * push;
+              nodes[i].y -= uy * push;
+              nodes[j].x += ux * push;
+              nodes[j].y += uy * push;
+            }
+          }
+        }
+        for (const n of nodes) {
+          const target = clusterCenters[n.cluster];
+          n.x += (target.x - n.x) * 0.02;
+          n.y += (target.y - n.y) * 0.02;
+          n.x = Math.max(75, Math.min(width - 75, n.x));
+          n.y = Math.max(55, Math.min(height - 55, n.y));
+        }
+      }
+    }
+
+    function draw() {
+      svg.innerHTML = "";
+      const activeIds = new Set(nodes.filter(matchesFilter).map(n => n.id));
+
+      for (const l of links) {
+        const visible = activeIds.has(l.source) && activeIds.has(l.target);
+        const connectedToSelected = selectedId && (l.source === selectedId || l.target === selectedId);
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        line.setAttribute("x1", l.sourceNode.x);
+        line.setAttribute("y1", l.sourceNode.y);
+        line.setAttribute("x2", l.targetNode.x);
+        line.setAttribute("y2", l.targetNode.y);
+        line.setAttribute("stroke", connectedToSelected ? "#7aa2f7" : "#2f3b52");
+        line.setAttribute("stroke-width", connectedToSelected ? "2.4" : "1.2");
+        line.setAttribute("opacity", visible ? (connectedToSelected ? "0.95" : "0.45") : "0.08");
+        line.style.cursor = "pointer";
+        line.addEventListener("mousemove", e => {
+          showTooltip(`<strong>Connection</strong><br>${l.note}`, e.clientX, e.clientY);
+        });
+        line.addEventListener("mouseleave", hideTooltip);
+        svg.appendChild(line);
+      }
+
+      for (const n of nodes) {
+        const visible = activeIds.has(n.id);
+        const isSelected = n.id === selectedId;
+        const color = COLORS[n.cluster];
+        const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.setAttribute("transform", `translate(${n.x},${n.y})`);
+        g.setAttribute("opacity", visible ? "1" : "0.15");
+        g.style.cursor = "pointer";
+
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("r", isSelected ? "14" : "10");
+        circle.setAttribute("fill", color);
+        circle.setAttribute("stroke", isSelected ? "#ffffff" : "#0c0f14");
+        circle.setAttribute("stroke-width", isSelected ? "2.5" : "1.5");
+
+        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        label.setAttribute("y", "24");
+        label.setAttribute("text-anchor", "middle");
+        label.setAttribute("fill", "#e8ecf3");
+        label.setAttribute("font-size", "11");
+        label.textContent = n.title.length > 26 ? n.title.slice(0, 24) + "…" : n.title;
+
+        g.appendChild(circle);
+        g.appendChild(label);
+
+        g.addEventListener("mousemove", e => {
+          showTooltip(
+            `<strong style="color:${color}">${n.title}</strong><br><span style="color:#9aa5b8;font-size:0.75rem;">${n.cluster}</span><p style="margin:6px 0 0;">${n.snippet}</p>`,
+            e.clientX,
+            e.clientY
+          );
+        });
+        g.addEventListener("mouseleave", hideTooltip);
+        g.addEventListener("click", () => renderInspector(n));
+        svg.appendChild(g);
+      }
+    }
+
+    clusterFilter.addEventListener("change", draw);
+    searchInput.addEventListener("input", draw);
+
+    stepSimulation();
+    draw();
+  </script>
+</body>
+</html>
