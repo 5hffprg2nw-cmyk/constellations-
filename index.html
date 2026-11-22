@@ -499,27 +499,31 @@
     }
 
     function stepSimulation() {
-      for (let iter = 0; iter < 120; iter++) {
+      for (let iter = 0; iter < 180; iter++) {
         for (let i = 0; i < nodes.length; i++) {
           for (let j = i + 1; j < nodes.length; j++) {
             const dx = nodes[j].x - nodes[i].x;
             const dy = nodes[j].y - nodes[i].y;
-            const dist = Math.hypot(dx, dy) || 1;
-            if (dist < 140) {
-              const push = (140 - dist) * 0.02;
-              const ux = dx / dist, uy = dy / dist;
-              nodes[i].x -= ux * push;
-              nodes[i].y -= uy * push;
-              nodes[j].x += ux * push;
-              nodes[j].y += uy * push;
+            // Treat horizontal distance as tighter so wide text labels don't collide
+            const scaledDx = dx * 0.65;
+            const scaledDy = dy * 1.15;
+            const dist = Math.hypot(scaledDx, scaledDy) || 1;
+            if (dist < 135) {
+              const push = (135 - dist) * 0.045;
+              const ux = scaledDx / dist;
+              const uy = scaledDy / dist;
+              nodes[i].x -= ux * push * 1.4;
+              nodes[i].y -= uy * push * 0.8;
+              nodes[j].x += ux * push * 1.4;
+              nodes[j].y += uy * push * 0.8;
             }
           }
         }
         for (const n of nodes) {
           const target = clusterCenters[n.cluster];
-          n.x += (target.x - n.x) * 0.01;
-          n.y += (target.y - n.y) * 0.01;
-          n.x = Math.max(75, Math.min(width - 75, n.x));
+          n.x += (target.x - n.x) * 0.012;
+          n.y += (target.y - n.y) * 0.012;
+          n.x = Math.max(145, Math.min(width - 145, n.x));
           n.y = Math.max(55, Math.min(height - 55, n.y));
         }
       }
