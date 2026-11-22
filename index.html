@@ -505,8 +505,8 @@
             const dx = nodes[j].x - nodes[i].x;
             const dy = nodes[j].y - nodes[i].y;
             const dist = Math.hypot(dx, dy) || 1;
-            if (dist < 130) {
-              const push = (130 - dist) * 0.02;
+            if (dist < 140) {
+              const push = (140 - dist) * 0.02;
               const ux = dx / dist, uy = dy / dist;
               nodes[i].x -= ux * push;
               nodes[i].y -= uy * push;
