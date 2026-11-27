@@ -112,8 +112,8 @@
         <option value="Situated, Decolonial & Diasporic Critiques">Situated, Decolonial & Diasporic Critiques</option>
       </select>
       <input id="searchInput" type="search" placeholder="Filter thinker or touchstone..." />
-      <button id="copyOffsetsBtn" type="button">Copy Offsets</button>
-      <span id="statusText" style="font-size: 0.8rem; color: var(--muted);"></span>
+      <button id="copyOffsetsBtn" type="button" hidden>Copy Offsets</button>
+      <span id="statusText" style="font-size: 0.8rem; color: var(--muted);" hidden></span>
     </div>
   </header>
   <div class="layout">
@@ -427,6 +427,8 @@
       "Situated, Decolonial & Diasporic Critiques": "#ff9e64"
     };
 
+    const ENABLE_OFFSET_EDITOR = false;
+
     const svg = document.getElementById("map");
     const tooltip = document.getElementById("tooltip");
     const inspector = document.getElementById("inspector");
@@ -448,83 +450,81 @@
       "Situated, Decolonial & Diasporic Critiques": { x: 640, y: 414 + yOffset }
     };
 
-    // Exact { x, y } canvas coordinates (900x650 viewBox).
-    // Leave { x: null, y: null } to let the layout simulation place a node.
     const nodeOffsets = {
-  "speculative-realism": {
-    "x": 357,
-    "y": 93
-  },
-  "neo-rationalism": {
-    "x": 150,
-    "y": 100
-  },
-  "non-philosophy": {
-    "x": 302,
-    "y": 154
-  },
-  "new-realism-grounding": {
-    "x": 179,
-    "y": 209
-  },
-  "feminist-new-materialism": {
-    "x": 489,
-    "y": 224
-  },
-  "plasticity-neuro-philosophy": {
-    "x": 570,
-    "y": 89
-  },
-  "philosophy-of-technics": {
-    "x": 753,
-    "y": 214
-  },
-  "actor-network-theory": {
-    "x": 575,
-    "y": 166
-  },
-  "enactivism-4e": {
-    "x": 755,
-    "y": 129
-  },
-  "lacanian-non-all": {
-    "x": 306,
-    "y": 266
-  },
-  "post-foundational-political": {
-    "x": 279,
-    "y": 350
-  },
-  "queer-negativity-trans": {
-    "x": 369,
-    "y": 397
-  },
-  "accelerationism-xenofeminism": {
-    "x": 145,
-    "y": 423
-  },
-  "post-liberal-critical-political": {
-    "x": 147,
-    "y": 312
-  },
-  "ontological-turn": {
-    "x": 619,
-    "y": 413
-  },
-  "indigenous-critical": {
-    "x": 518,
-    "y": 315
-  },
-  "decolonial-theory": {
-    "x": 721,
-    "y": 361
-  },
-  "afro-pessimism-para-ontology": {
-    "x": 708,
-    "y": 273
-  }
-};
-    
+      "speculative-realism": {
+        "x": 357,
+        "y": 93
+      },
+      "neo-rationalism": {
+        "x": 150,
+        "y": 100
+      },
+      "non-philosophy": {
+        "x": 302,
+        "y": 154
+      },
+      "new-realism-grounding": {
+        "x": 179,
+        "y": 209
+      },
+      "feminist-new-materialism": {
+        "x": 489,
+        "y": 224
+      },
+      "plasticity-neuro-philosophy": {
+        "x": 570,
+        "y": 89
+      },
+      "philosophy-of-technics": {
+        "x": 753,
+        "y": 214
+      },
+      "actor-network-theory": {
+        "x": 575,
+        "y": 166
+      },
+      "enactivism-4e": {
+        "x": 755,
+        "y": 129
+      },
+      "lacanian-non-all": {
+        "x": 306,
+        "y": 266
+      },
+      "post-foundational-political": {
+        "x": 279,
+        "y": 350
+      },
+      "queer-negativity-trans": {
+        "x": 369,
+        "y": 397
+      },
+      "accelerationism-xenofeminism": {
+        "x": 145,
+        "y": 423
+      },
+      "post-liberal-critical-political": {
+        "x": 147,
+        "y": 312
+      },
+      "ontological-turn": {
+        "x": 619,
+        "y": 413
+      },
+      "indigenous-critical": {
+        "x": 518,
+        "y": 315
+      },
+      "decolonial-theory": {
+        "x": 721,
+        "y": 361
+      },
+      "afro-pessimism-para-ontology": {
+        "x": 708,
+        "y": 273
+      }
+    };
+
     function hasSavedPos(id) {
       const p = nodeOffsets[id];
       return p && typeof p.x === "number" && typeof p.y === "number";
@@ -741,14 +741,16 @@
         text.setAttribute("font-weight", isSelected ? "600" : "400");
         text.textContent = n.title;
 
-        g.addEventListener("mousedown", e => {
-          e.stopPropagation();
-          draggedNode = n;
-          draggedEl = g;
-          wasDragged = false;
-          hideTooltip();
-          setStatus(`Dragging ${n.title}...`);
-        });
+        if (ENABLE_OFFSET_EDITOR) {
+          g.addEventListener("mousedown", e => {
+            e.stopPropagation();
+            draggedNode = n;
+            draggedEl = g;
+            wasDragged = false;
+            hideTooltip();
+            setStatus(`Dragging ${n.title}...`);
+          });
+        }
         g.addEventListener("mousemove", e => {
           if (draggedNode) return;
           showTooltip(`<strong>${n.title}</strong><br><span style="color:#9aa5b8;">${n.cluster}</span><br><br>${n.snippet}`, e.clientX, e.clientY);
@@ -774,7 +776,7 @@
     }
 
     window.addEventListener("mousemove", e => {
-      if (!draggedNode) return;
+      if (!ENABLE_OFFSET_EDITOR || !draggedNode) return;
       wasDragged = true;
       const p = toSvgPoint(e.clientX, e.clientY);
       draggedNode.x = Math.max(145, Math.min(width - 145, Math.round(p.x)));
@@ -785,7 +787,7 @@
     });
 
     window.addEventListener("mouseup", () => {
-      if (!draggedNode) return;
+      if (!ENABLE_OFFSET_EDITOR || !draggedNode) return;
       const x = Math.round(draggedNode.x);
       const y = Math.round(draggedNode.y);
       nodeOffsets[draggedNode.id] = { x, y };
@@ -797,6 +799,7 @@
     });
 
     copyOffsetsBtn.addEventListener("click", async () => {
+      if (!ENABLE_OFFSET_EDITOR) return;
       const snippet = `const nodeOffsets = ${JSON.stringify(nodeOffsets, null, 2)};`;
       try {
         await navigator.clipboard.writeText(snippet);
