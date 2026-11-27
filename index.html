@@ -639,17 +639,61 @@
         text.setAttribute("font-weight", isSelected ? "600" : "400");
         text.textContent = n.title;
 
+        g.addEventListener("mousedown", e => {
+          e.stopPropagation();
+          draggedNode = n;
+          hideTooltip();
+        });
         g.addEventListener("mousemove", e => {
+          if (draggedNode) return;
           showTooltip(`<strong>${n.title}</strong><br><span style="color:#9aa5b8;">${n.cluster}</span><br><br>${n.snippet}`, e.clientX, e.clientY);
         });
         g.addEventListener("mouseleave", hideTooltip);
-        g.addEventListener("click", () => renderInspector(n));
+        g.addEventListener("click", () => {
+          if (!wasDragged) renderInspector(n);
+          wasDragged = false;
+        });
 
         g.appendChild(circle);
         g.appendChild(text);
         svg.appendChild(g);
       }
     }
+
+    let draggedNode = null;
+    let wasDragged = false;
+
+    function toSvgPoint(clientX, clientY) {
+      const pt = svg.createSVGPoint();
+      pt.x = clientX;
+      pt.y = clientY;
+      const ctm = svg.getScreenCTM();
+      return ctm ? pt.matrixTransform(ctm.inverse()) : { x: 0, y: 0 };
+    }
+
+    window.addEventListener("mousemove", e => {
+      if (!draggedNode) return;
+      wasDragged = true;
+      const p = toSvgPoint(e.clientX, e.clientY);
+      draggedNode.x = Math.max(145, Math.min(width - 145, Math.round(p.x)));
+      draggedNode.y = Math.max(25, Math.min(height - 20, Math.round(p.y)));
+      draw();
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (!draggedNode) return;
+      const targetX = draggedNode.x;
+      const targetY = draggedNode.y;
+      stepSimulation();
+      nodeOffsets[draggedNode.id] = {
+        dx: Math.round(targetX - draggedNode.x),
+        dy: Math.round(targetY - draggedNode.y)
+      };
+      applyNodeOffsets();
+      console.log("const nodeOffsets =", JSON.stringify(nodeOffsets, null, 2));
+      draggedNode = null;
+      draw();
+    });
 
     clusterFilter.addEventListener("change", draw);
     searchInput.addEventListener("input", draw);
