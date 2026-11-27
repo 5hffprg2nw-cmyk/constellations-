@@ -14,7 +14,7 @@
       --accent: #7aa2f7;
       --border: #283142;
     }
-    * { box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: system-ui, -apple-system, sans-serif;
@@ -431,12 +431,24 @@
     const height = 650;
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
-    const yOffset = -55;
+    const yOffset = -28;
     const clusterCenters = {
       "Ontological & Realist Breaks": { x: 225, y: 155 + yOffset },
       "Materiality, Embodiment & Technics": { x: 665, y: 220 + yOffset },
       "Subjectivity, Negativity & Politics": { x: 260, y: 460 + yOffset },
       "Situated, Decolonial & Diasporic Critiques": { x: 640, y: 460 + yOffset }
+    };
+
+    const nodeOffsets = {
+      "speculative-realism": { dx: -14, dy: -16 },
+      "neo-rationalism": { dx: 18, dy: 12 },
+      "non-philosophy": { dx: -18, dy: 18 },
+      "new-realism-grounding": { dx: 14, dy: -10 },
+      "feminist-new-materialism": { dx: -16, dy: -14 },
+      "plasticity-neuro-philosophy": { dx: 16, dy: 16 },
+      "philosophy-of-technics": { dx: 20, dy: -16 },
+      "actor-network-theory": { dx: -12, dy: 14 },
+      "enactivism-4e": { dx: 8, dy: 20 }
     };
 
     const nodes = CONSTELLATIONS.map((c, i) => {
@@ -457,6 +469,15 @@
       sourceNode: nodeById[l.source],
       targetNode: nodeById[l.target]
     }));
+
+    function applyNodeOffsets() {
+      for (const n of nodes) {
+        const off = nodeOffsets[n.id];
+        if (!off) continue;
+        n.x = Math.max(145, Math.min(width - 145, n.x + (off.dx || 0)));
+        n.y = Math.max(25, Math.min(height - 20, n.y + (off.dy || 0)));
+      }
+    }
 
     function showTooltip(html, x, y) {
       tooltip.innerHTML = html;
@@ -586,36 +607,34 @@
         const visible = activeIds.has(n.id);
         const isSelected = n.id === selectedId;
         const color = COLORS[n.cluster];
+
         const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-        g.setAttribute("transform", `translate(${n.x},${n.y})`);
-        g.setAttribute("opacity", visible ? "1" : "0.15");
+        g.setAttribute("transform", `translate(${n.x}, ${n.y})`);
         g.style.cursor = "pointer";
+        g.style.opacity = visible ? "1" : "0.18";
 
         const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        circle.setAttribute("r", isSelected ? "14" : "10");
+        circle.setAttribute("r", isSelected ? "10" : "7.5");
         circle.setAttribute("fill", color);
         circle.setAttribute("stroke", isSelected ? "#ffffff" : "#0c0f14");
         circle.setAttribute("stroke-width", isSelected ? "2.5" : "1.5");
 
-        const label = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        label.setAttribute("y", "24");
-        label.setAttribute("text-anchor", "middle");
-        label.setAttribute("fill", "#e8ecf3");
-        label.setAttribute("font-size", "11");
-        label.textContent = n.title;
-        
-        g.appendChild(circle);
-        g.appendChild(label);
+        const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        text.setAttribute("dy", "-13");
+        text.setAttribute("text-anchor", "middle");
+        text.setAttribute("fill", "#e8ecf3");
+        text.setAttribute("font-size", "11.5");
+        text.setAttribute("font-weight", isSelected ? "600" : "400");
+        text.textContent = n.title;
 
         g.addEventListener("mousemove", e => {
-          showTooltip(
-            `<strong style="color:${color}">${n.title}</strong><br><span style="color:#9aa5b8;font-size:0.75rem;">${n.cluster}</span><p style="margin:6px 0 0;">${n.snippet}</p>`,
-            e.clientX,
-            e.clientY
-          );
+          showTooltip(`<strong>${n.title}</strong><br><span style="color:#9aa5b8;">${n.cluster}</span><br><br>${n.snippet}`, e.clientX, e.clientY);
         });
         g.addEventListener("mouseleave", hideTooltip);
         g.addEventListener("click", () => renderInspector(n));
+
+        g.appendChild(circle);
+        g.appendChild(text);
         svg.appendChild(g);
       }
     }
@@ -624,6 +643,7 @@
     searchInput.addEventListener("input", draw);
 
     stepSimulation();
+    applyNodeOffsets();
     draw();
   </script>
 </body>
