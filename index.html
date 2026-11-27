@@ -449,85 +449,30 @@
     };
 
     const nodeOffsets = {
-  "speculative-realism": {
-    "dx": 0,
-    "dy": 0
-  },
-  "neo-rationalism": {
-    "dx": 0,
-    "dy": 0
-  },
-  "non-philosophy": {
-    "dx": 0,
-    "dy": 0
-  },
-  "new-realism-grounding": {
-    "dx": 0,
-    "dy": 0
-  },
-  "feminist-new-materialism": {
-    "dx": 0,
-    "dy": 0
-  },
-  "plasticity-neuro-philosophy": {
-    "dx": 0,
-    "dy": 0
-  },
-  "philosophy-of-technics": {
-    "dx": 0,
-    "dy": 0
-  },
-  "actor-network-theory": {
-    "dx": 0,
-    "dy": 0
-  },
-  "enactivism-4e": {
-    "dx": 0,
-    "dy": 0
-  },
-  "lacanian-non-all": {
-    "dx": 0,
-    "dy": 0
-  },
-  "post-foundational-political": {
-    "dx": 0,
-    "dy": 0
-  },
-  "queer-negativity-trans": {
-    "dx": 0,
-    "dy": 0
-  },
-  "accelerationism-xenofeminism": {
-    "dx": 0,
-    "dy": 0
-  },
-  "post-liberal-critical-political": {
-    "dx": 0,
-    "dy": 0
-  },
-  "ontological-turn": {
-    "dx": 0,
-    "dy": 0
-  },
-  "indigenous-critical": {
-    "dx": 0,
-    "dy": 0
-  },
-  "decolonial-theory": {
-    "dx": 0,
-    "dy": 0
-  },
-  "afro-pessimism-para-ontology": {
-    "dx": 0,
-    "dy": 0
-  }
-};
-    
-    const pinnedIds = new Set(
-      Object.entries(nodeOffsets)
-        .filter(([, off]) => (off.dx || 0) !== 0 || (off.dy || 0) !== 0)
-        .map(([id]) => id)
-    );
+      "speculative-realism": { dx: 0, dy: 0 },
+      "neo-rationalism": { dx: 0, dy: 0 },
+      "non-philosophy": { dx: 0, dy: 0 },
+      "new-realism-grounding": { dx: 0, dy: 0 },
+
+      "feminist-new-materialism": { dx: 0, dy: 0 },
+      "plasticity-neuro-philosophy": { dx: 0, dy: 0 },
+      "philosophy-of-technics": { dx: 0, dy: 0 },
+      "actor-network-theory": { dx: 0, dy: 0 },
+      "enactivism-4e": { dx: 0, dy: 0 },
+
+      "lacanian-non-all": { dx: 0, dy: 0 },
+      "post-foundational-political": { dx: 0, dy: 0 },
+      "queer-negativity-trans": { dx: 0, dy: 0 },
+      "accelerationism-xenofeminism": { dx: 0, dy: 0 },
+      "post-liberal-critical-political": { dx: 0, dy: 0 },
+
+      "ontological-turn": { dx: 0, dy: 0 },
+      "indigenous-critical": { dx: 0, dy: 0 },
+      "decolonial-theory": { dx: 0, dy: 0 },
+      "afro-pessimism-para-ontology": { dx: 0, dy: 0 }
+    };
+
+    const pinnedIds = new Set();
 
     const nodes = CONSTELLATIONS.map((c, i) => {
       const base = clusterCenters[c.cluster];
@@ -571,8 +516,10 @@
       for (const n of nodes) {
         const base = initialSimPos[n.id] || { x: n.x, y: n.y };
         const off = nodeOffsets[n.id] || { dx: 0, dy: 0 };
+        const hasOffset = (off.dx || 0) !== 0 || (off.dy || 0) !== 0;
         n.x = Math.max(145, Math.min(width - 145, base.x + (off.dx || 0)));
         n.y = Math.max(25, Math.min(height - 20, base.y + (off.dy || 0)));
+        if (hasOffset) pinnedIds.add(n.id);
       }
     }
 
