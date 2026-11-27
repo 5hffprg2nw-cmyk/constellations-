@@ -451,29 +451,80 @@
     // Exact { x, y } canvas coordinates (900x650 viewBox).
     // Leave { x: null, y: null } to let the layout simulation place a node.
     const nodeOffsets = {
-      "speculative-realism": { x: null, y: null },
-      "neo-rationalism": { x: null, y: null },
-      "non-philosophy": { x: null, y: null },
-      "new-realism-grounding": { x: null, y: null },
-
-      "feminist-new-materialism": { x: null, y: null },
-      "plasticity-neuro-philosophy": { x: null, y: null },
-      "philosophy-of-technics": { x: null, y: null },
-      "actor-network-theory": { x: null, y: null },
-      "enactivism-4e": { x: null, y: null },
-
-      "lacanian-non-all": { x: null, y: null },
-      "post-foundational-political": { x: null, y: null },
-      "queer-negativity-trans": { x: null, y: null },
-      "accelerationism-xenofeminism": { x: null, y: null },
-      "post-liberal-critical-political": { x: null, y: null },
-
-      "ontological-turn": { x: null, y: null },
-      "indigenous-critical": { x: null, y: null },
-      "decolonial-theory": { x: null, y: null },
-      "afro-pessimism-para-ontology": { x: null, y: null }
-    };
-
+  "speculative-realism": {
+    "x": 357,
+    "y": 93
+  },
+  "neo-rationalism": {
+    "x": 150,
+    "y": 100
+  },
+  "non-philosophy": {
+    "x": 302,
+    "y": 154
+  },
+  "new-realism-grounding": {
+    "x": 179,
+    "y": 209
+  },
+  "feminist-new-materialism": {
+    "x": 489,
+    "y": 224
+  },
+  "plasticity-neuro-philosophy": {
+    "x": 570,
+    "y": 89
+  },
+  "philosophy-of-technics": {
+    "x": 753,
+    "y": 214
+  },
+  "actor-network-theory": {
+    "x": 575,
+    "y": 166
+  },
+  "enactivism-4e": {
+    "x": 755,
+    "y": 129
+  },
+  "lacanian-non-all": {
+    "x": 306,
+    "y": 266
+  },
+  "post-foundational-political": {
+    "x": 279,
+    "y": 350
+  },
+  "queer-negativity-trans": {
+    "x": 369,
+    "y": 397
+  },
+  "accelerationism-xenofeminism": {
+    "x": 145,
+    "y": 423
+  },
+  "post-liberal-critical-political": {
+    "x": 147,
+    "y": 312
+  },
+  "ontological-turn": {
+    "x": 619,
+    "y": 413
+  },
+  "indigenous-critical": {
+    "x": 518,
+    "y": 315
+  },
+  "decolonial-theory": {
+    "x": 721,
+    "y": 361
+  },
+  "afro-pessimism-para-ontology": {
+    "x": 708,
+    "y": 273
+  }
+};
+    
     function hasSavedPos(id) {
       const p = nodeOffsets[id];
       return p && typeof p.x === "number" && typeof p.y === "number";
