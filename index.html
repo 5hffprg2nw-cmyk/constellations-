@@ -497,10 +497,9 @@
       targetNode: nodeById[l.target]
     }));
 
+    const initialSimPos = {};
     let draggedNode = null;
     let draggedEl = null;
-    let startBaseX = 0;
-    let startBaseY = 0;
     let wasDragged = false;
 
     function setStatus(msg) {
@@ -511,12 +510,18 @@
       return pinnedIds.has(nodeId) || draggedNode?.id === nodeId;
     }
 
+    function recordInitialSimPos() {
+      for (const n of nodes) {
+        initialSimPos[n.id] = { x: n.x, y: n.y };
+      }
+    }
+
     function applyNodeOffsets() {
       for (const n of nodes) {
-        const off = nodeOffsets[n.id];
-        if (!off) continue;
-        n.x = Math.max(145, Math.min(width - 145, n.x + (off.dx || 0)));
-        n.y = Math.max(25, Math.min(height - 20, n.y + (off.dy || 0)));
+        const base = initialSimPos[n.id] || { x: n.x, y: n.y };
+        const off = nodeOffsets[n.id] || { dx: 0, dy: 0 };
+        n.x = Math.max(145, Math.min(width - 145, base.x + (off.dx || 0)));
+        n.y = Math.max(25, Math.min(height - 20, base.y + (off.dy || 0)));
       }
     }
 
@@ -690,9 +695,6 @@
           e.stopPropagation();
           draggedNode = n;
           draggedEl = g;
-          const off = nodeOffsets[n.id] || { dx: 0, dy: 0 };
-          startBaseX = n.x - (off.dx || 0);
-          startBaseY = n.y - (off.dy || 0);
           wasDragged = false;
           hideTooltip();
           setStatus(`Dragging ${n.title}...`);
@@ -734,8 +736,9 @@
 
     window.addEventListener("mouseup", () => {
       if (!draggedNode) return;
-      const dx = Math.round(draggedNode.x - startBaseX);
-      const dy = Math.round(draggedNode.y - startBaseY);
+      const base = initialSimPos[draggedNode.id] || { x: draggedNode.x, y: draggedNode.y };
+      const dx = Math.round(draggedNode.x - base.x);
+      const dy = Math.round(draggedNode.y - base.y);
       nodeOffsets[draggedNode.id] = { dx, dy };
       pinnedIds.add(draggedNode.id);
       setStatus(`Locked ${draggedNode.id}: dx ${dx}, dy ${dy}`);
@@ -766,6 +769,7 @@
     searchInput.addEventListener("input", draw);
 
     stepSimulation();
+    recordInitialSimPos();
     applyNodeOffsets();
     draw();
   </script>
