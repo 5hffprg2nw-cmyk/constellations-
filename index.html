@@ -431,7 +431,7 @@
     const height = 650;
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
-    const yOffset = -28;
+    const yOffset = -65;
     const clusterCenters = {
       "Ontological & Realist Breaks": { x: 260, y: 200 },
       "Materiality, Embodiment & Technics": { x: 640, y: 200 },
@@ -525,7 +525,7 @@
           n.x += (target.x - n.x) * 0.012;
           n.y += (target.y - n.y) * 0.012;
           n.x = Math.max(145, Math.min(width - 145, n.x));
-          n.y = Math.max(55, Math.min(height - 20, n.y));
+          n.y = Math.max(25, Math.min(height - 20, n.y));
         }
 
         const ant = nodeById["actor-network-theory"];
@@ -551,9 +551,9 @@
             const ux2 = dx2 / dist2;
             const uy2 = dy2 / dist2;
             fnm.x = Math.max(145, Math.min(width - 145, fnm.x - ux2 * push2));
-            fnm.y = Math.max(55, Math.min(height - 55, fnm.y - uy2 * push2 + 0.6));
+            fnm.y = Math.max(25, Math.min(height - 55, fnm.y - uy2 * push2 + 0.6));
             pot.x = Math.max(145, Math.min(width - 145, pot.x + ux2 * push2));
-            pot.y = Math.max(55, Math.min(height - 55, pot.y + uy2 * push2 - 1.4));
+            pot.y = Math.max(25, Math.min(height - 55, pot.y + uy2 * push2 - 1.4));
           }
         }
       }
