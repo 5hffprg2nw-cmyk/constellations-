@@ -449,29 +449,80 @@
     };
 
     const nodeOffsets = {
-      "speculative-realism": { dx: 0, dy: 0 },
-      "neo-rationalism": { dx: 0, dy: 0 },
-      "non-philosophy": { dx: 0, dy: 0 },
-      "new-realism-grounding": { dx: 0, dy: 0 },
-
-      "feminist-new-materialism": { dx: 0, dy: 0 },
-      "plasticity-neuro-philosophy": { dx: 0, dy: 0 },
-      "philosophy-of-technics": { dx: 0, dy: 0 },
-      "actor-network-theory": { dx: 0, dy: 0 },
-      "enactivism-4e": { dx: 0, dy: 0 },
-
-      "lacanian-non-all": { dx: 0, dy: 0 },
-      "post-foundational-political": { dx: 0, dy: 0 },
-      "queer-negativity-trans": { dx: 0, dy: 0 },
-      "accelerationism-xenofeminism": { dx: 0, dy: 0 },
-      "post-liberal-critical-political": { dx: 0, dy: 0 },
-
-      "ontological-turn": { dx: 0, dy: 0 },
-      "indigenous-critical": { dx: 0, dy: 0 },
-      "decolonial-theory": { dx: 0, dy: 0 },
-      "afro-pessimism-para-ontology": { dx: 0, dy: 0 }
-    };
-
+  "speculative-realism": {
+    "dx": 19,
+    "dy": 7
+  },
+  "neo-rationalism": {
+    "dx": -1,
+    "dy": -36
+  },
+  "non-philosophy": {
+    "dx": -57,
+    "dy": -27
+  },
+  "new-realism-grounding": {
+    "dx": -42,
+    "dy": -22
+  },
+  "feminist-new-materialism": {
+    "dx": -67,
+    "dy": -40
+  },
+  "plasticity-neuro-philosophy": {
+    "dx": -89,
+    "dy": 29
+  },
+  "philosophy-of-technics": {
+    "dx": 12,
+    "dy": -33
+  },
+  "actor-network-theory": {
+    "dx": 13,
+    "dy": -14
+  },
+  "enactivism-4e": {
+    "dx": -9,
+    "dy": -55
+  },
+  "lacanian-non-all": {
+    "dx": -81,
+    "dy": -45
+  },
+  "post-foundational-political": {
+    "dx": 25,
+    "dy": -8
+  },
+  "queer-negativity-trans": {
+    "dx": -11,
+    "dy": -14
+  },
+  "accelerationism-xenofeminism": {
+    "dx": -34,
+    "dy": -66
+  },
+  "post-liberal-critical-political": {
+    "dx": -1,
+    "dy": -34
+  },
+  "ontological-turn": {
+    "dx": 10,
+    "dy": -110
+  },
+  "indigenous-critical": {
+    "dx": -1,
+    "dy": -84
+  },
+  "decolonial-theory": {
+    "dx": -58,
+    "dy": -54
+  },
+  "afro-pessimism-para-ontology": {
+    "dx": -73,
+    "dy": -89
+  }
+};
+    
     const pinnedIds = new Set(
       Object.entries(nodeOffsets)
         .filter(([, off]) => (off.dx || 0) !== 0 || (off.dy || 0) !== 0)
