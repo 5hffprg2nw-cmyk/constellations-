@@ -113,6 +113,7 @@
       </select>
       <input id="searchInput" type="search" placeholder="Filter thinker or touchstone..." />
       <button id="copyOffsetsBtn" type="button">Copy Offsets</button>
+      <span id="statusText" style="font-size: 0.8rem; color: var(--muted);"></span>
     </div>
   </header>
   <div class="layout">
@@ -432,6 +433,7 @@
     const clusterFilter = document.getElementById("clusterFilter");
     const searchInput = document.getElementById("searchInput");
     const copyOffsetsBtn = document.getElementById("copyOffsetsBtn");
+    const statusText = document.getElementById("statusText");
 
     let selectedId = null;
     const width = 900;
@@ -446,80 +448,35 @@
       "Situated, Decolonial & Diasporic Critiques": { x: 640, y: 414 + yOffset }
     };
 
-   const nodeOffsets = {
-  "speculative-realism": {
-    "dx": 9,
-    "dy": 9
-  },
-  "neo-rationalism": {
-    "dx": 0,
-    "dy": 0
-  },
-  "non-philosophy": {
-    "dx": -2,
-    "dy": -15
-  },
-  "new-realism-grounding": {
-    "dx": 0,
-    "dy": 0
-  },
-  "feminist-new-materialism": {
-    "dx": 0,
-    "dy": 0
-  },
-  "plasticity-neuro-philosophy": {
-    "dx": -55,
-    "dy": 12
-  },
-  "philosophy-of-technics": {
-    "dx": 0,
-    "dy": 0
-  },
-  "actor-network-theory": {
-    "dx": 0,
-    "dy": 0
-  },
-  "enactivism-4e": {
-    "dx": 0,
-    "dy": 0
-  },
-  "lacanian-non-all": {
-    "dx": 11,
-    "dy": -13
-  },
-  "post-foundational-political": {
-    "dx": -1,
-    "dy": 8
-  },
-  "queer-negativity-trans": {
-    "dx": 0,
-    "dy": 0
-  },
-  "accelerationism-xenofeminism": {
-    "dx": 0,
-    "dy": 0
-  },
-  "post-liberal-critical-political": {
-    "dx": 0,
-    "dy": 0
-  },
-  "ontological-turn": {
-    "dx": -3,
-    "dy": -22
-  },
-  "indigenous-critical": {
-    "dx": -12,
-    "dy": -12
-  },
-  "decolonial-theory": {
-    "dx": 0,
-    "dy": 0
-  },
-  "afro-pessimism-para-ontology": {
-    "dx": 2,
-    "dy": -20
-  }
-};
+    const nodeOffsets = {
+      "speculative-realism": { dx: 0, dy: 0 },
+      "neo-rationalism": { dx: 0, dy: 0 },
+      "non-philosophy": { dx: 0, dy: 0 },
+      "new-realism-grounding": { dx: 0, dy: 0 },
+
+      "feminist-new-materialism": { dx: 0, dy: 0 },
+      "plasticity-neuro-philosophy": { dx: 0, dy: 0 },
+      "philosophy-of-technics": { dx: 0, dy: 0 },
+      "actor-network-theory": { dx: 0, dy: 0 },
+      "enactivism-4e": { dx: 0, dy: 0 },
+
+      "lacanian-non-all": { dx: 0, dy: 0 },
+      "post-foundational-political": { dx: 0, dy: 0 },
+      "queer-negativity-trans": { dx: 0, dy: 0 },
+      "accelerationism-xenofeminism": { dx: 0, dy: 0 },
+      "post-liberal-critical-political": { dx: 0, dy: 0 },
+
+      "ontological-turn": { dx: 0, dy: 0 },
+      "indigenous-critical": { dx: 0, dy: 0 },
+      "decolonial-theory": { dx: 0, dy: 0 },
+      "afro-pessimism-para-ontology": { dx: 0, dy: 0 }
+    };
+
+    const pinnedIds = new Set(
+      Object.entries(nodeOffsets)
+        .filter(([, off]) => (off.dx || 0) !== 0 || (off.dy || 0) !== 0)
+        .map(([id]) => id)
+    );
 
     const nodes = CONSTELLATIONS.map((c, i) => {
       const base = clusterCenters[c.cluster];
@@ -539,6 +496,20 @@
       sourceNode: nodeById[l.source],
       targetNode: nodeById[l.target]
     }));
+
+    let draggedNode = null;
+    let draggedEl = null;
+    let startBaseX = 0;
+    let startBaseY = 0;
+    let wasDragged = false;
+
+    function setStatus(msg) {
+      statusText.textContent = msg;
+    }
+
+    function isLocked(nodeId) {
+      return pinnedIds.has(nodeId) || draggedNode?.id === nodeId;
+    }
 
     function applyNodeOffsets() {
       for (const n of nodes) {
@@ -591,9 +562,13 @@
     }
 
     function stepSimulation() {
-      for (let iter = 0; iter < 180; iter++) {
+      for (let iter = 0; iter < 60; iter++) {
         for (let i = 0; i < nodes.length; i++) {
           for (let j = i + 1; j < nodes.length; j++) {
+            const aLocked = isLocked(nodes[i].id);
+            const bLocked = isLocked(nodes[j].id);
+            if (aLocked && bLocked) continue;
+
             const dx = nodes[j].x - nodes[i].x;
             const dy = nodes[j].y - nodes[i].y;
             const scaledDx = dx * 0.65;
@@ -603,15 +578,20 @@
               const push = (135 - dist) * 0.045;
               const ux = scaledDx / dist;
               const uy = scaledDy / dist;
-              nodes[i].x -= ux * push * 1.4;
-              nodes[i].y -= uy * push * 0.8;
-              nodes[j].x += ux * push * 1.4;
-              nodes[j].y += uy * push * 0.8;
+              if (!aLocked) {
+                nodes[i].x = Math.max(145, Math.min(width - 145, nodes[i].x - ux * push * 1.4));
+                nodes[i].y = Math.max(25, Math.min(height - 20, nodes[i].y - uy * push * 0.8));
+              }
+              if (!bLocked) {
+                nodes[j].x = Math.max(145, Math.min(width - 145, nodes[j].x + ux * push * 1.4));
+                nodes[j].y = Math.max(25, Math.min(height - 20, nodes[j].y + uy * push * 0.8));
+              }
             }
           }
         }
 
         for (const n of nodes) {
+          if (isLocked(n.id)) continue;
           const target = clusterCenters[n.cluster];
           n.x += (target.x - n.x) * 0.012;
           n.y += (target.y - n.y) * 0.012;
@@ -626,8 +606,12 @@
           const gapY = Math.abs(ant.y - nonPhil.y);
           if (gapY < 55 && gapX < 290) {
             const shift = (290 - gapX) * 0.04;
-            nonPhil.x = Math.max(145, nonPhil.x - shift);
-            ant.x = Math.min(width - 145, ant.x + shift);
+            if (!isLocked(nonPhil.id)) {
+              nonPhil.x = Math.max(145, nonPhil.x - shift);
+            }
+            if (!isLocked(ant.id)) {
+              ant.x = Math.min(width - 145, ant.x + shift);
+            }
           }
         }
 
@@ -641,10 +625,14 @@
             const push2 = (185 - dist2) * 0.05;
             const ux2 = dx2 / dist2;
             const uy2 = dy2 / dist2;
-            fnm.x = Math.max(145, Math.min(width - 145, fnm.x - ux2 * push2));
-            fnm.y = Math.max(25, Math.min(height - 55, fnm.y - uy2 * push2 + 0.6));
-            pot.x = Math.max(145, Math.min(width - 145, pot.x + ux2 * push2));
-            pot.y = Math.max(25, Math.min(height - 55, pot.y + uy2 * push2 - 1.4));
+            if (!isLocked(fnm.id)) {
+              fnm.x = Math.max(145, Math.min(width - 145, fnm.x - ux2 * push2));
+              fnm.y = Math.max(25, Math.min(height - 55, fnm.y - uy2 * push2 + 0.6));
+            }
+            if (!isLocked(pot.id)) {
+              pot.x = Math.max(145, Math.min(width - 145, pot.x + ux2 * push2));
+              pot.y = Math.max(25, Math.min(height - 55, pot.y + uy2 * push2 - 1.4));
+            }
           }
         }
       }
@@ -679,6 +667,7 @@
         const color = COLORS[n.cluster];
 
         const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        g.dataset.id = n.id;
         g.setAttribute("transform", `translate(${n.x}, ${n.y})`);
         g.style.cursor = "pointer";
         g.style.opacity = visible ? "1" : "0.18";
@@ -700,7 +689,13 @@
         g.addEventListener("mousedown", e => {
           e.stopPropagation();
           draggedNode = n;
+          draggedEl = g;
+          const off = nodeOffsets[n.id] || { dx: 0, dy: 0 };
+          startBaseX = n.x - (off.dx || 0);
+          startBaseY = n.y - (off.dy || 0);
+          wasDragged = false;
           hideTooltip();
+          setStatus(`Dragging ${n.title}...`);
         });
         g.addEventListener("mousemove", e => {
           if (draggedNode) return;
@@ -718,9 +713,6 @@
       }
     }
 
-    let draggedNode = null;
-    let wasDragged = false;
-
     function toSvgPoint(clientX, clientY) {
       const pt = svg.createSVGPoint();
       pt.x = clientX;
@@ -735,21 +727,20 @@
       const p = toSvgPoint(e.clientX, e.clientY);
       draggedNode.x = Math.max(145, Math.min(width - 145, Math.round(p.x)));
       draggedNode.y = Math.max(25, Math.min(height - 20, Math.round(p.y)));
-      draw();
+      if (draggedEl) {
+        draggedEl.setAttribute("transform", `translate(${draggedNode.x}, ${draggedNode.y})`);
+      }
     });
 
     window.addEventListener("mouseup", () => {
       if (!draggedNode) return;
-      const targetX = draggedNode.x;
-      const targetY = draggedNode.y;
-      stepSimulation();
-      nodeOffsets[draggedNode.id] = {
-        dx: Math.round(targetX - draggedNode.x),
-        dy: Math.round(targetY - draggedNode.y)
-      };
-      applyNodeOffsets();
-      console.log("const nodeOffsets =", JSON.stringify(nodeOffsets, null, 2));
+      const dx = Math.round(draggedNode.x - startBaseX);
+      const dy = Math.round(draggedNode.y - startBaseY);
+      nodeOffsets[draggedNode.id] = { dx, dy };
+      pinnedIds.add(draggedNode.id);
+      setStatus(`Locked ${draggedNode.id}: dx ${dx}, dy ${dy}`);
       draggedNode = null;
+      draggedEl = null;
       draw();
     });
 
@@ -767,6 +758,7 @@
       }
       const prev = copyOffsetsBtn.textContent;
       copyOffsetsBtn.textContent = "Copied!";
+      setStatus("Copied nodeOffsets to clipboard");
       setTimeout(() => { copyOffsetsBtn.textContent = prev; }, 1200);
     });
 
