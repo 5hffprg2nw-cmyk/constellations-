@@ -431,12 +431,12 @@
     const height = 650;
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
-    const yOffset = -65;
+    const yOffset = -28;
     const clusterCenters = {
-      "Ontological & Realist Breaks": { x: 260, y: 200 },
-      "Materiality, Embodiment & Technics": { x: 640, y: 200 },
-      "Subjectivity, Negativity & Politics": { x: 260, y: 460 },
-      "Situated, Decolonial & Diasporic Critiques": { x: 640, y: 460 }
+      "Ontological & Realist Breaks": { x: 260, y: 200 + yOffset },
+      "Materiality, Embodiment & Technics": { x: 640, y: 200 + yOffset },
+      "Subjectivity, Negativity & Politics": { x: 260, y: 460 + yOffset },
+      "Situated, Decolonial & Diasporic Critiques": { x: 640, y: 460 + yOffset }
     };
 
     const nodes = CONSTELLATIONS.map((c, i) => {
