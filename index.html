@@ -32,8 +32,8 @@
       background: var(--panel);
     }
     h1 { font-size: 1.1rem; margin: 0; }
-    .controls { display: flex; gap: 10px; flex-wrap: wrap; }
-    select, input {
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    select, input, button {
       background: var(--panel-2);
       color: var(--text);
       border: 1px solid var(--border);
@@ -41,6 +41,11 @@
       padding: 7px 10px;
       font-size: 0.9rem;
     }
+    button {
+      cursor: pointer;
+      border-color: var(--accent);
+    }
+    button:hover { background: #242e40; }
     .layout {
       display: grid;
       grid-template-columns: 1fr 380px;
@@ -107,6 +112,7 @@
         <option value="Situated, Decolonial & Diasporic Critiques">Situated, Decolonial & Diasporic Critiques</option>
       </select>
       <input id="searchInput" type="search" placeholder="Filter thinker or touchstone..." />
+      <button id="copyOffsetsBtn" type="button">Copy Offsets</button>
     </div>
   </header>
   <div class="layout">
@@ -425,6 +431,7 @@
     const inspector = document.getElementById("inspector");
     const clusterFilter = document.getElementById("clusterFilter");
     const searchInput = document.getElementById("searchInput");
+    const copyOffsetsBtn = document.getElementById("copyOffsetsBtn");
 
     let selectedId = null;
     const width = 900;
@@ -693,6 +700,23 @@
       console.log("const nodeOffsets =", JSON.stringify(nodeOffsets, null, 2));
       draggedNode = null;
       draw();
+    });
+
+    copyOffsetsBtn.addEventListener("click", async () => {
+      const snippet = `const nodeOffsets = ${JSON.stringify(nodeOffsets, null, 2)};`;
+      try {
+        await navigator.clipboard.writeText(snippet);
+      } catch {
+        const area = document.createElement("textarea");
+        area.value = snippet;
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+      }
+      const prev = copyOffsetsBtn.textContent;
+      copyOffsetsBtn.textContent = "Copied!";
+      setTimeout(() => { copyOffsetsBtn.textContent = prev; }, 1200);
     });
 
     clusterFilter.addEventListener("change", draw);
