@@ -448,31 +448,40 @@
       "Situated, Decolonial & Diasporic Critiques": { x: 640, y: 414 + yOffset }
     };
 
+    // Exact { x, y } canvas coordinates (900x650 viewBox).
+    // Leave { x: null, y: null } to let the layout simulation place a node.
     const nodeOffsets = {
-      "speculative-realism": { dx: 0, dy: 0 },
-      "neo-rationalism": { dx: 0, dy: 0 },
-      "non-philosophy": { dx: 0, dy: 0 },
-      "new-realism-grounding": { dx: 0, dy: 0 },
+      "speculative-realism": { x: null, y: null },
+      "neo-rationalism": { x: null, y: null },
+      "non-philosophy": { x: null, y: null },
+      "new-realism-grounding": { x: null, y: null },
 
-      "feminist-new-materialism": { dx: 0, dy: 0 },
-      "plasticity-neuro-philosophy": { dx: 0, dy: 0 },
-      "philosophy-of-technics": { dx: 0, dy: 0 },
-      "actor-network-theory": { dx: 0, dy: 0 },
-      "enactivism-4e": { dx: 0, dy: 0 },
+      "feminist-new-materialism": { x: null, y: null },
+      "plasticity-neuro-philosophy": { x: null, y: null },
+      "philosophy-of-technics": { x: null, y: null },
+      "actor-network-theory": { x: null, y: null },
+      "enactivism-4e": { x: null, y: null },
 
-      "lacanian-non-all": { dx: 0, dy: 0 },
-      "post-foundational-political": { dx: 0, dy: 0 },
-      "queer-negativity-trans": { dx: 0, dy: 0 },
-      "accelerationism-xenofeminism": { dx: 0, dy: 0 },
-      "post-liberal-critical-political": { dx: 0, dy: 0 },
+      "lacanian-non-all": { x: null, y: null },
+      "post-foundational-political": { x: null, y: null },
+      "queer-negativity-trans": { x: null, y: null },
+      "accelerationism-xenofeminism": { x: null, y: null },
+      "post-liberal-critical-political": { x: null, y: null },
 
-      "ontological-turn": { dx: 0, dy: 0 },
-      "indigenous-critical": { dx: 0, dy: 0 },
-      "decolonial-theory": { dx: 0, dy: 0 },
-      "afro-pessimism-para-ontology": { dx: 0, dy: 0 }
+      "ontological-turn": { x: null, y: null },
+      "indigenous-critical": { x: null, y: null },
+      "decolonial-theory": { x: null, y: null },
+      "afro-pessimism-para-ontology": { x: null, y: null }
     };
 
-    const pinnedIds = new Set();
+    function hasSavedPos(id) {
+      const p = nodeOffsets[id];
+      return p && typeof p.x === "number" && typeof p.y === "number";
+    }
+
+    const pinnedIds = new Set(
+      CONSTELLATIONS.map(c => c.id).filter(id => hasSavedPos(id))
+    );
 
     const nodes = CONSTELLATIONS.map((c, i) => {
       const base = clusterCenters[c.cluster];
@@ -493,7 +502,6 @@
       targetNode: nodeById[l.target]
     }));
 
-    const initialSimPos = {};
     let draggedNode = null;
     let draggedEl = null;
     let wasDragged = false;
@@ -506,20 +514,13 @@
       return pinnedIds.has(nodeId) || draggedNode?.id === nodeId;
     }
 
-    function recordInitialSimPos() {
+    function applySavedPositions() {
       for (const n of nodes) {
-        initialSimPos[n.id] = { x: n.x, y: n.y };
-      }
-    }
-
-    function applyNodeOffsets() {
-      for (const n of nodes) {
-        const base = initialSimPos[n.id] || { x: n.x, y: n.y };
-        const off = nodeOffsets[n.id] || { dx: 0, dy: 0 };
-        const hasOffset = (off.dx || 0) !== 0 || (off.dy || 0) !== 0;
-        n.x = Math.max(145, Math.min(width - 145, base.x + (off.dx || 0)));
-        n.y = Math.max(25, Math.min(height - 20, base.y + (off.dy || 0)));
-        if (hasOffset) pinnedIds.add(n.id);
+        const p = nodeOffsets[n.id];
+        if (!p || typeof p.x !== "number" || typeof p.y !== "number") continue;
+        n.x = Math.max(145, Math.min(width - 145, Math.round(p.x)));
+        n.y = Math.max(25, Math.min(height - 20, Math.round(p.y)));
+        pinnedIds.add(n.id);
       }
     }
 
@@ -734,12 +735,11 @@
 
     window.addEventListener("mouseup", () => {
       if (!draggedNode) return;
-      const base = initialSimPos[draggedNode.id] || { x: draggedNode.x, y: draggedNode.y };
-      const dx = Math.round(draggedNode.x - base.x);
-      const dy = Math.round(draggedNode.y - base.y);
-      nodeOffsets[draggedNode.id] = { dx, dy };
+      const x = Math.round(draggedNode.x);
+      const y = Math.round(draggedNode.y);
+      nodeOffsets[draggedNode.id] = { x, y };
       pinnedIds.add(draggedNode.id);
-      setStatus(`Locked ${draggedNode.id}: dx ${dx}, dy ${dy}`);
+      setStatus(`Locked ${draggedNode.id} at (${x}, ${y})`);
       draggedNode = null;
       draggedEl = null;
       draw();
@@ -759,7 +759,7 @@
       }
       const prev = copyOffsetsBtn.textContent;
       copyOffsetsBtn.textContent = "Copied!";
-      setStatus("Copied nodeOffsets to clipboard");
+      setStatus("Copied exact { x, y } nodeOffsets to clipboard");
       setTimeout(() => { copyOffsetsBtn.textContent = prev; }, 1200);
     });
 
@@ -767,8 +767,7 @@
     searchInput.addEventListener("input", draw);
 
     stepSimulation();
-    recordInitialSimPos();
-    applyNodeOffsets();
+    applySavedPositions();
     draw();
   </script>
 </body>
